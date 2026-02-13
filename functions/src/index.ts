@@ -49,12 +49,16 @@ export const tinyChunkStream = onCall(async () => {
   return { chunks }; // all chunks are returned together by callable
 });
 
-export const testStreamingCallable = onCall(async (data) => {
-    // Safely get parameters
-    const count = data?.data?.count ?? 5;
-    const delay = data?.data?.delay ?? 500; // ms
+// Helper to format timestamps
+function timestamp(): string {
+    return new Date().toISOString(); // e.g., 2026-02-13T13:52:45.123Z
+  }
   
-    logger.info("Streaming function called", { count, delay });
+  export const testStreamingCallable = onCall(async (data) => {
+    const count = data?.data?.count ?? 5;
+    const delay = data?.data?.delay ?? 500; // milliseconds
+  
+    logger.info(`${timestamp()} - Streaming function called`, { count, delay });
   
     const results: string[] = [];
     const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -63,9 +67,12 @@ export const testStreamingCallable = onCall(async (data) => {
       await sleep(delay);
       const chunk = `chunk_${i}`;
       results.push(chunk);
-      logger.info("Sent chunk", chunk);
+  
+      // Log each chunk with timestamp
+      logger.info(`${timestamp()} - Sent chunk: ${chunk}`);
     }
   
+    logger.info(`${timestamp()} - Streaming function completed`);
     return { results };
   });
   
